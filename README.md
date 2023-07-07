@@ -26,7 +26,7 @@ The output is pushed into the html page and a graph is created using javascript 
 
 # How to run the app
 Download the repository.<br>
-Before running the app.py file, please save the model_64_64_1.pkl file in the same directory as the app.py file.<br/>
+Before running the app.py file, please save the model_64_64_1.pkl (saved in models folder) file in the same directory as the app.py file.<br/>
 Run the app.py file. <br/>
 Hit the link displayed in the terminal.<br/>
 Input data in the form.<br/>
