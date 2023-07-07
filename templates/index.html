@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body{
+            background: #0F2027;  /* fallback for old browsers */
+            background: -webkit-linear-gradient(to top, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to top, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            color: #e3d7d7;
+        }
+    </style>
+    <title>AQI Prediction</title>
+</head>
+<body>
+    <div class="container">
+        <h1 style="width: 100%; text-align: center;">AQI Prediction</h1>
+        <form method="post" action="/submit">
+            <div class="form-group">
+                <label for="State">State:</label>
+                <select class="form-control" id="State" name="State" required>
+                    <option value="">Select State</option>
+                    <option value="Alabama">Alabama</option>
+                    <option value="Alaska">Alaska</option>
+                    <option value="Arizona">Arizona</option>
+                    <option value="Arkansas">Arkansas</option>
+                    <option value="California">California</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Colorado">Colorado</option>
+                    <option value="Connecticut">Connecticut</option>
+                    <option value="Country Of Mexico">Country Of Mexico</option>
+                    <option value="Delaware">Delaware</option>
+                    <option value="District Of Columbia">District Of Columbia</option>
+                    <option value="Florida">Florida</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Hawaii">Hawaii</option>
+                    <option value="Idaho">Idaho</option>
+                    <option value="Illinois">Illinois</option>
+                    <option value="Indiana">Indiana</option>
+                    <option value="Iowa">Iowa</option>
+                    <option value="Kansas">Kansas</option>
+                    <option value="Kentucky">Kentucky</option>
+                    <option value="Louisiana">Louisiana</option>
+                    <option value="Maine">Maine</option>
+                    <option value="Maryland">Maryland</option>
+                    <option value="Massachusetts">Massachusetts</option>
+                    <option value="Michigan">Michigan</option>
+                    <option value="Minnesota">Minnesota</option>
+                    <option value="Mississippi">Mississippi</option>
+                    <option value="Missouri">Missouri</option>
+                    <option value="Montana">Montana</option>
+                    <option value="Nebraska">Nebraska</option>
+                    <option value="Nevada">Nevada</option>
+                    <option value="New Hampshire">New Hampshire</option>
+                    <option value="New Jersey">New Jersey</option>
+                    <option value="New Mexico">New Mexico</option>
+                    <option value="New York">New York</option>
+                    <option value="North Carolina">North Carolina</option>
+                    <option value="North Dakota">North Dakota</option>
+                    <option value="Ohio">Ohio</option>
+                    <option value="Oklahoma">Oklahoma</option>
+                    <option value="Oregon">Oregon</option>
+                    <option value="Pennsylvania">Pennsylvania</option>
+                    <option value="Puerto Rico">Puerto Rico</option>
+                    <option value="Rhode Island">Rhode Island</option>
+                    <option value="South Carolina">South Carolina</option>
+                    <option value="South Dakota">South Dakota</option>
+                    <option value="Tennessee">Tennessee</option>
+                    <option value="Texas">Texas</option>
+                    <option value="Utah">Utah</option>
+                    <option value="Vermont">Vermont</option>
+                    <option value="Virgin Islands">Virgin Islands</option>
+                    <option value="Virginia">Virginia</option>
+                    <option value="Washington">Washington</option>
+                    <option value="West Virginia">West Virginia</option>
+                    <option value="Wisconsin">Wisconsin</option>
+                    <option value="Wyoming">Wyoming</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="County">County:</label>
+                <select class="form-control" id="County" name="County" required></select>
+            </div>
+
+            <div class="form-group">
+                <label for="Year">Year:</label>
+                <input type="number" class="form-control" id="Year" name="Year" required>
+            </div>
+            <button type="submit" id ="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn btn-secondary">Reset</button>
+        </form>
+    <div id="output" style="width: 100%; text-align: center; font-size: xx-large; font-weight: bolder;"></div>
+    </div>
+
+    <script>
+        var stateDropDown = document.getElementById("State");
+        var countyDropDown = document.getElementById("County");
+
+        var countyOptions = {
+            'Alabama': ['Autauga', 'Jefferson', 'Madison', 'Mobile', 'Monroe', 'Morgan',
+            'Tuscaloosa', 'Etowah', 'Cullman', 'Montgomery', 'Shelby',
+            'Houston', 'Marengo', 'Russell', 'Calhoun', 'Colbert', 'DeKalb',
+            'Elmore', 'Escambia', 'Franklin', 'Jackson', 'Pike', 'Talladega',
+            'Walker', 'Clay', 'Sumter', 'Lawrence', 'Geneva', 'Limestone',
+            'Baldwin', 'Barbour'],  
+        
+            'Alaska': ['Anchorage ', 'Fairbanks North Star ', 'North Slope ',
+            'Valdez-Cordova ', 'Juneau ', 'Denali ', 'Kenai Peninsula ',
+            'Sitka ', 'Ketchikan Gateway ', 'Matanuska-Susitna ',
+            'Aleutians East ', 'Northwest Arctic ', 'Skagway-Hoonah-Angoon',
+            'Wrangell Petersburg', 'Yukon-Koyukuk ', 'Bethel '],  
+            
+            'Arizona': ['Cochise', 'Coconino', 'Greenlee', 'Maricopa', 'Pima', 'Yavapai',
+            'Yuma', 'Apache', 'Gila', 'Graham', 'Santa Cruz', 'Navajo',
+            'Mohave', 'Pinal', 'La Paz'],  
+            
+            'Arkansas': ['Pulaski', 'Arkansas', 'Boone', 'Ashley', 'Craighead',
+            'Crittenden', 'Garland', 'Jefferson', 'Marion', 'Miller',
+            'Mississippi', 'Ouachita', 'Phillips', 'Polk', 'Pope', 'Sebastian',
+            'Union', 'Washington', 'White', 'Clark', 'Montgomery', 'Newton',
+            'Faulkner', 'Jackson', 'Van Buren', 'Benton'],  
+            
+            'California': ['Alameda', 'Butte', 'Colusa', 'Contra Costa', 'El Dorado',
+            'Fresno', 'Glenn', 'Imperial', 'Inyo', 'Kern', 'Kings', 'Lake',
+            'Los Angeles', 'Marin', 'Mendocino', 'Mono', 'Monterey', 'Napa',
+            'Orange', 'Placer', 'Riverside', 'Sacramento', 'San Benito',
+            'San Bernardino', 'San Diego', 'San Francisco', 'San Joaquin',
+            'San Luis Obispo', 'San Mateo', 'Santa Barbara', 'Santa Clara',
+            'Santa Cruz', 'Shasta', 'Solano', 'Sonoma', 'Stanislaus', 'Sutter',
+            'Tulare', 'Tuolumne', 'Ventura', 'Yolo', 'Madera', 'Siskiyou',
+            'Merced', 'Humboldt', 'Mariposa', 'Plumas', 'Tehama', 'Del Norte',
+            'Trinity', 'Yuba', 'Nevada', 'Amador', 'Calaveras', 'Modoc',
+            'Lassen', 'Sierra', 'Alpine'],  
+            
+            'Canada': ['New Brunswick', 'Saskatchewan', 'Ontario'],  
+            
+            'Colorado': ['Adams', 'Arapahoe', 'Boulder', 'Denver', 'El Paso', 'Jefferson',
+            'Larimer', 'Mesa', 'Pueblo', 'Weld', 'Archuleta', 'Eagle',
+            'Garfield', 'Gunnison', 'Prowers', 'Routt', 'San Miguel',
+            'Fremont', 'Alamosa', 'Delta', 'Montezuma', 'Pitkin', 'San Juan',
+            'Douglas', 'La Plata', 'Lincoln', 'Logan', 'Summit', 'Jackson',
+            'Teller', 'Montrose', 'Elbert', 'Clear Creek', 'Park', 'Chaffee',
+            'Morgan', 'Rio Blanco', 'Moffat', 'Grand', 'Gilpin'],  
+            
+            'Connecticut': ['Fairfield', 'Hartford', 'Litchfield', 'Middlesex', 'New Haven',
+            'Tolland', 'New London', 'Windham'],  
+            
+            'Country Of Mexico': ['CHIHUAHUA STATE', 'SONORA', 'BAJA CALIFORNIA NORTE'],  
+            
+            'Delaware': ['Kent', 'New Castle', 'Sussex'],  
+            
+            'District Of Columbia': ['District of Columbia'],  
+            
+            'Florida': ['Alachua', 'Broward', 'Duval', 'Escambia', 'Hillsborough', 'Lee',
+            'Leon', 'Manatee', 'Miami-Dade', 'Orange', 'Palm Beach',
+            'Pinellas', 'Seminole', 'Sarasota', 'St. Johns', 'Brevard',
+            'Liberty', 'Bay', 'Gulf', 'Okaloosa', 'Pasco', 'Polk', 'Volusia',
+            'Citrus', 'Hamilton', 'Nassau', 'Osceola', 'Putnam', 'Collier',
+            'St. Lucie', 'Baker', 'Holmes', 'Martin', 'Lake', 'Monroe',
+            'Marion', 'Columbia', 'Santa Rosa', 'Wakulla', 'Highlands',
+            'Indian River', 'Flagler'],  
+            
+            'Georgia': ['DeKalb', 'Fulton', 'Muscogee', 'Paulding', 'Rockdale', 'Chatham',
+            'Dawson', 'Douglas', 'McIntosh', 'Sumter', 'Richmond', 'Chattooga',
+            'Pike', 'Spalding', 'Charlton', 'Washington', 'Elbert', 'Fannin',
+            'Glynn', 'Gwinnett', 'Bibb', 'Dougherty', 'Floyd', 'Walker',
+            'Fayette', 'Cherokee', 'Clarke', 'Clayton', 'Cobb', 'Coweta',
+            'Hall', 'Henry', 'Wilkinson', 'Houston', 'Lowndes', 'Murray',
+            'Coffee', 'Columbia', 'Walton'],  
+            
+            'Guam': ['Guam'],  
+            
+            'Hawaii': ['Honolulu', 'Kauai', 'Hawaii', 'Maui'],  
+            
+            'Idaho': ['Ada', 'Bannock', 'Bonner', 'Caribou', 'Kootenai', 'Nez Perce',
+            'Shoshone', 'Twin Falls', 'Latah', 'Clearwater', 'Bonneville',
+            'Blaine', 'Lemhi', 'Lewis', 'Butte', 'Canyon', 'Custer', 'Madison',
+            'Minidoka', 'Power', 'Boundary', 'Benewah', 'Bingham', 'Elmore',
+            'Boise', 'Idaho', 'Valley', 'Franklin', 'Gem', 'Cassia', 'Jerome'],
+            
+            'Illinois': ['Adams', 'Champaign', 'Cook', 'Crawford', 'DuPage', 'Kane',
+            'La Salle', 'Lake', 'Macon', 'Macoupin', 'Madison', 'McHenry',
+            'Monroe', 'Peoria', 'Rock Island', 'Saint Clair', 'Sangamon',
+            'Will', 'Williamson', 'Winnebago', 'Effingham', 'Kankakee',
+            'Coles', 'Jersey', 'Livingston', 'Jackson', 'Randolph', 'Logan',
+            'Tazewell', 'Jo Daviess', 'Hamilton', 'McLean', 'Clark'],
+            
+            'Indiana': ['Allen', 'Clark', 'Hancock', 'Jasper', 'Jefferson', 'Kosciusko',
+            'Lake', 'Marion', 'Porter', 'Posey', 'Spencer', 'St. Joseph',
+            'Sullivan', 'Vanderburgh', 'Vigo', 'Dearborn', 'Dubois', 'Knox',
+            'Morgan', 'Wayne', 'Hamilton', 'Tippecanoe', 'Johnson', 'Warrick',
+            'Floyd', 'Montgomery', 'Vermillion', 'Wabash', 'Washington',
+            'Bartholomew', 'Carroll', 'DeKalb', 'Delaware', 'Madison',
+            'Huntington', 'LaPorte', 'Switzerland', 'Elkhart', 'Daviess',
+            'Lawrence', 'Perry', 'Hendricks', 'Gibson', 'Howard', 'Boone',
+            'Greene', 'Henry', 'Jackson', 'Putnam', 'Shelby', 'Whitley',
+            'Monroe', 'Brown'],  
+            
+            'Iowa': ['Dubuque', 'Johnson', 'Linn', 'Madison', 'Polk', 'Scott',
+            'Woodbury', 'Cerro Gordo', 'Clinton', 'Pottawattamie', 'Delaware',
+            'Black Hawk', 'Van Buren', 'Emmet', 'Muscatine', 'Union',
+            'Harrison', 'Palo Alto', 'Story', 'Warren', 'Bremer', 'Lee',
+            'Montgomery', 'Wright', 'Tama'],  
+            
+            'Kansas': ['Johnson', 'Sedgwick', 'Wyandotte', 'Jefferson', 'Cloud', 'Ford',
+            'Sherman', 'Neosho', 'Shawnee', 'Montgomery', 'Morton', 'Greeley',
+            'Kearny', 'Miami', 'Pawnee', 'Linn', 'Sumner', 'Trego', 'Brown',
+            'Chase', 'Riley', 'Douglas', 'Leavenworth'],  
+            
+            'Kentucky': ['Boone', 'Boyd', 'Boyle', 'Bullitt', 'Calloway', 'Campbell',
+            'Clark', 'Daviess', 'Fayette', 'Hancock', 'Hardin', 'Henderson',
+            'Hopkins', 'Jefferson', 'Kenton', 'McCracken', 'Mercer',
+            'Muhlenberg', 'Ohio', 'Pulaski', 'Trimble', 'Clay', 'Floyd',
+            'Fulton', 'Greenup', 'Henry', 'Livingston', 'Logan', 'Metcalfe',
+            'Oldham', 'Pendleton', 'Trigg', 'Warren', 'Carter', 'Edmonson',
+            'Mason', 'Lawrence', 'Bell', 'Madison', 'Perry', 'Pike',
+            'Washington', 'Graves', 'Harlan', 'Jessamine', 'Marshall',
+            'McLean', 'Simpson', 'Whitley', 'Christian', 'Morgan', 'Scott',
+            'Franklin', 'Laurel', 'Larue'],  
+            
+            'Louisiana': ['Bossier', 'Calcasieu', 'East Baton Rouge', 'Grant', 'Iberville',
+            'Orleans', 'St. Charles', 'St. John the Baptist', 'Caddo',
+            'Ouachita', 'St. Bernard', 'Jefferson', 'Ascension', 'Beauregard',
+            'Lafayette', 'Lafourche', 'Pointe Coupee', 'St. James', 'St. Mary',
+            'West Baton Rouge', 'Rapides', 'Livingston', 'Jackson',
+            'Concordia', 'Tangipahoa', 'Plaquemines', 'Terrebonne', 'Winn',
+            'St. Tammany', 'St. Martin'],  
+            
+            'Maine': ['Androscoggin', 'Aroostook', 'Cumberland', 'Kennebec', 'Penobscot',
+            'Franklin', 'Oxford', 'Hancock', 'York', 'Lincoln', 'Washington',
+            'Waldo', 'Knox', 'Somerset', 'Sagadahoc', 'MOBILE MONITORS',
+            'Piscataquis'],  
+            
+            'Maryland': ['Allegany', 'Anne Arundel', 'Baltimore', 'Baltimore (City)',
+            'Cecil', 'Frederick', 'Harford', 'Howard', 'Montgomery',
+            "Prince George's", 'Washington', 'Carroll', 'Charles', 'Wicomico',
+            'Kent', 'Garrett', 'Dorchester', 'Calvert', 'Worcester'],
+            
+            'Massachusetts': ['Berkshire', 'Bristol', 'Essex', 'Franklin', 'Hampden',
+            'Middlesex', 'Norfolk', 'Suffolk', 'Worcester', 'Hampshire',
+            'Barnstable', 'Plymouth', 'Dukes'],  
+            
+            'Michigan': ['Bay', 'Cass', 'Clinton', 'Genesee', 'Huron', 'Ingham', 'Kent',
+            'Macomb', 'Marquette', 'Muskegon', 'Oakland', 'Saginaw',
+            'St. Clair', 'Washtenaw', 'Wayne', 'Osceola', 'Oscoda',
+            'Dickinson', 'Calhoun', 'Alpena', 'Houghton', 'Monroe', 'Keweenaw',
+            'Midland', 'Ottawa', 'Mason', 'Montmorency', 'Allegan', 'Gratiot',
+            'Manistee', 'Tuscola', 'Benzie', 'Berrien', 'Delta', 'Kalamazoo',
+            'Montcalm', 'Oceana', 'Van Buren', 'Cheboygan', 'Sanilac',
+            'Lenawee', 'Mecosta', 'Roscommon', 'Missaukee', 'Grand Traverse',
+            'Ontonagon', 'Schoolcraft', 'Wexford', 'Chippewa', 'Leelanau',
+            'Iron', 'Presque Isle', 'Emmet'],  
+            
+            'Minnesota': ['Anoka', 'Blue Earth', 'Dakota', 'Hennepin', 'Lake', 'Olmsted',
+            'Ramsey', 'Saint Louis', 'Sherburne', 'Washington', 'Koochiching',
+            'Stearns', 'Wright', 'Carlton', 'Beltrami', 'Hubbard', 'Douglas',
+            'Goodhue', 'Morrison', 'Pine', 'Pipestone', 'Mille Lacs',
+            'Otter Tail', 'Roseau', 'Yellow Medicine', 'Clay', 'Swift',
+            'Winona', 'Freeborn', 'McLeod', 'Crow Wing', 'Itasca', 'Kandiyohi',
+            'Nicollet', 'Scott', 'Rock', 'Cass', 'Becker', 'Lyon', 'Cook'],
+            
+            'Mississippi': ['DeSoto', 'Hinds', 'Madison', 'Jackson', 'Adams', 'Hancock',
+            'Lamar', 'Lauderdale', 'Lowndes', 'Warren', 'Lee', 'Yalobusha',
+            'Coahoma', 'Jones', 'Washington', 'Franklin', 'Sharkey', 'Choctaw',
+            'Panola', 'Bolivar', 'Forrest', 'Harrison', 'Rankin', 'Scott',
+            'Pearl River', 'Alcorn', 'Grenada', 'Marshall', 'Webster'],
+            
+            'Missouri': ['Clay', 'Greene', 'Jackson', 'Madison', 'Platte', 'Saint Charles',
+            'Saint Louis', 'St. Louis City', 'Jefferson', 'Cass', 'Audrain',
+            'Buchanan', 'Marion', 'Atchison', 'Boone', 'Monroe', 'Texas',
+            'Taney', 'Christian', 'Cole', 'Howell', 'Sainte Genevieve',
+            'Cedar', 'Jasper', 'Lincoln', 'Mercer', 'Stoddard', 'Maries',
+            'Sullivan', 'Cooper', 'Clinton', 'Perry', 'Andrew', 'Callaway'],
+            
+            'Montana': ['Cascade', 'Deer Lodge', 'Missoula', 'Rosebud', 'Silver Bow',
+            'Yellowstone', 'Flathead', 'Gallatin', 'Lake', 'Lewis and Clark',
+            'Lincoln', 'Powell', 'Sanders', 'Jefferson', 'Ravalli', 'Fergus',
+            'Park', 'Stillwater', 'Sweet Grass', 'Broadwater', 'Madison',
+            'Blaine', 'Phillips', 'Big Horn', 'Roosevelt', 'Glacier',
+            'Sheridan', 'Musselshell', 'McCone', 'Richland', 'Powder River',
+            'Custer'],  
+            
+            'Nebraska': ['Custer', 'Dakota', 'Douglas', 'Lancaster', 'Cass', 'Otoe',
+            'Adams', 'Buffalo', 'Scotts Bluff', 'Dawson', 'Gage', 'Hall',
+            'Nemaha', 'Sarpy', 'Cedar', 'Cherry', 'Deuel', 'Lincoln',
+            'Washington', 'Garden', 'Thomas', 'Thurston', 'Knox', 'Sioux'],
+            
+            'Nevada': ['Clark', 'Washoe', 'Carson City', 'Douglas', 'Lander', 'Elko',
+            'White Pine', 'Churchill', 'Pershing', 'Mineral', 'Nye', 'Lyon'],
+            
+            'New Hampshire': ['Cheshire', 'Coos', 'Hillsborough', 'Rockingham', 'Merrimack',
+            'Grafton', 'Strafford', 'Sullivan', 'Belknap', 'Carroll'],
+            
+            'New Jersey': ['Atlantic', 'Bergen', 'Burlington', 'Camden', 'Cape May',
+            'Cumberland', 'Essex', 'Gloucester', 'Hudson', 'Hunterdon',
+            'Mercer', 'Middlesex', 'Monmouth', 'Morris', 'Ocean', 'Passaic',
+            'Salem', 'Somerset', 'Union', 'Warren'],  
+            
+            'New Mexico': ['Bernalillo', 'Dona Ana', 'San Juan', 'Santa Fe', 'Sandoval',
+            'Catron', 'Eddy', 'Grant', 'Luna', 'Los Alamos', 'Valencia',
+            'Chaves', 'Hidalgo', 'Lea', 'McKinley', 'Taos', 'Cibola', 'Otero',
+            'Rio Arriba', 'Socorro', 'Lincoln'],  
+            
+            'New York': ['Bronx', 'Broome', 'Chemung', 'Dutchess', 'Erie', 'Essex', 'Kings',
+            'Monroe', 'Nassau', 'New York', 'Niagara', 'Oneida', 'Onondaga',
+            'Queens', 'Rensselaer', 'Richmond', 'Schenectady', 'Suffolk',
+            'Warren', 'Wayne', 'Westchester', 'Albany', 'Saratoga', 'Franklin',
+            'Greene', 'Jefferson', 'Orange', 'Ulster', 'Chautauqua',
+            'Herkimer', 'Madison', 'Putnam', 'Steuben', 'Tompkins', 'Hamilton',
+            'Rockland', 'Columbia', 'St. Lawrence', 'Oswego'],  
+            
+            'North Carolina': ['Buncombe', 'Durham', 'Forsyth', 'Granville', 'Guilford', 'Jones',
+            'Mecklenburg', 'New Hanover', 'Wake', 'Caldwell', 'Cumberland',
+            'Alexander', 'Davie', 'Haywood', 'Lincoln', 'Montgomery', 'Person',
+            'Pitt', 'Robeson', 'Rockingham', 'Edgecombe', 'Johnston', 'Martin',
+            'Chatham', 'Brunswick', 'Camden', 'Avery', 'Harnett', 'Macon',
+            'McDowell', 'Mitchell', 'Onslow', 'Pasquotank', 'Wayne', 'Burke',
+            'Cabarrus', 'Catawba', 'Davidson', 'Duplin', 'Gaston', 'Halifax',
+            'Rowan', 'Wilson', 'Yancey', 'Alamance', 'Beaufort', 'Caswell',
+            'Franklin', 'Carteret', 'Henderson', 'Orange', 'Watauga',
+            'Northampton', 'Swain', 'Lenoir', 'Jackson', 'Union', 'Hyde',
+            'Randolph', 'Graham', 'Nash', 'Lee'],  
+            
+            'North Dakota': ['Dunn', 'Mercer', 'Oliver', 'McKenzie', 'Burleigh', 'Cass',
+            'Grand Forks', 'Stark', 'Stutsman', 'Williams', 'Billings', 'Ward',
+            'Burke', 'McLean', 'Steele'],  
+            
+            'Ohio': ['Allen', 'Ashtabula', 'Butler', 'Clark', 'Clermont', 'Clinton',
+            'Cuyahoga', 'Franklin', 'Hamilton', 'Hocking', 'Jefferson', 'Lake',
+            'Lorain', 'Lucas', 'Mahoning', 'Medina', 'Montgomery', 'Portage',
+            'Preble', 'Stark', 'Summit', 'Warren', 'Mercer', 'Trumbull',
+            'Columbiana', 'Noble', 'Sandusky', 'Adams', 'Pickaway', 'Belmont',
+            'Knox', 'Lawrence', 'Scioto', 'Greene', 'Wyandot', 'Crawford',
+            'Fayette', 'Huron', 'Logan', 'Ottawa', 'Richland', 'Union',
+            'Washington', 'Athens', 'Hancock', 'Jackson', 'Licking', 'Madison',
+            'Seneca', 'Tuscarawas', 'Miami', 'Monroe', 'Delaware', 'Geauga',
+            'Wood', 'Erie', 'Gallia', 'Harrison'],  
+            
+            'Oklahoma': ['Cleveland', 'Oklahoma', 'Tulsa', 'McClain', 'Muskogee',
+            'Comanche', 'Kay', 'Carter', 'Mayes', 'Woodward', 'Garfield',
+            'Custer', 'Latimer', 'Okmulgee', 'Pittsburg', 'Canadian',
+            'Cherokee', 'Jefferson', 'Love', 'Marshall', 'Ottawa', 'Payne',
+            'Pottawatomie', 'Caddo', 'Lincoln', 'Pawnee', 'Seminole', 'Adair',
+            'Dewey', 'Ellis', 'Cotton', 'Creek', 'Johnston', 'Sequoyah',
+            'McCurtain', 'Osage', 'Bryan', 'Grady', 'Washington', 'Choctaw',
+            'Le Flore', 'Nowata', 'Grant', 'Kiowa', 'Pontotoc'],  
+            
+            'Oregon': ['Clackamas', 'Columbia', 'Crook', 'Jackson', 'Lane', 'Marion',
+            'Multnomah', 'Josephine', 'Deschutes', 'Umatilla', 'Union',
+            'Lincoln', 'Linn', 'Klamath', 'Wasco', 'Douglas', 'Lake', 'Benton',
+            'Washington', 'Harney', 'Wallowa', 'Baker', 'Grant', 'Jefferson',
+            'Yamhill', 'Coos'],  
+            
+            'Pennsylvania': ['Allegheny', 'Beaver', 'Berks', 'Blair', 'Bucks', 'Butler',
+            'Cambria', 'Dauphin', 'Delaware', 'Erie', 'Lackawanna',
+            'Lancaster', 'Lawrence', 'Lehigh', 'Luzerne', 'Lycoming',
+            'Montgomery', 'Northampton', 'Perry', 'Philadelphia', 'Washington',
+            'Westmoreland', 'York', 'Mercer', 'Adams', 'Centre', 'Chester',
+            'Elk', 'Schuylkill', 'Somerset', 'Clearfield', 'Franklin',
+            'Armstrong', 'Greene', 'Monroe', 'Tioga', 'Cumberland', 'Indiana',
+            'Lebanon', 'Bradford', 'Fayette', 'Susquehanna', 'Wyoming'],
+            
+            'Puerto Rico': ['San Juan', 'Toa Baja', 'Ponce', 'Guaynabo', 'Florida', 'Bayamon',
+            'Guayama', 'Fajardo', 'Barceloneta', 'Carolina', 'Manati',
+            'Catano', 'Rio Grande', 'Humacao', 'Guayanilla', 'Lares',
+            'Mayagnez', 'Vieques', 'Adjuntas', 'Salinas', 'Juncos', 'Caguas'],
+            
+            'Rhode Island': ['Kent', 'Providence', 'Washington'],  
+            
+            'South Carolina': ['Beaufort', 'Berkeley', 'Chester', 'Colleton', 'Darlington',
+            'Edgefield', 'Greenville', 'Horry', 'Lexington', 'Pickens',
+            'Richland', 'York', 'Charleston', 'Georgetown', 'Union', 'Aiken',
+            'Barnwell', 'Cherokee', 'Oconee', 'Spartanburg', 'Abbeville',
+            'Anderson', 'Fairfield', 'Williamsburg', 'Florence', 'Greenwood',
+            'Chesterfield', 'Orangeburg'],  
+            
+            'South Dakota': ['Brown', 'Campbell', 'Hughes', 'Pennington', 'Perkins',
+            'Minnehaha', 'Jackson', 'Brookings', 'Custer', 'Meade', 'Roberts',
+            'Codington', 'Union', 'Clay'],  
+            
+            'Tennessee': ['Davidson', 'Giles', 'Hamilton', 'Knox', 'Maury', 'Shelby',
+            'Sullivan', 'Sumner', 'Roane', 'Montgomery', 'Bradley', 'Blount',
+            'McMinn', 'Madison', 'Fayette', 'DeKalb', 'Rutherford', 'Sevier',
+            'Union', 'Williamson', 'Wilson', 'Claiborne', 'Loudon', 'Tipton',
+            'Moore', 'Anderson', 'Jefferson', 'Dickson', 'Hamblen', 'Haywood',
+            'Marshall', 'Washington', 'Benton', 'Coffee', 'Dyer', 'Henry',
+            'Putnam', 'Humphreys', 'Lawrence', 'Greene', 'Meigs', 'Obion'],
+            
+            'Texas': ['Bexar', 'Brazoria', 'Cameron', 'Dallas', 'Ector', 'El Paso',
+            'Galveston', 'Gregg', 'Harris', 'Hutchinson', 'Jefferson',
+            'Nueces', 'Orange', 'Potter', 'Tarrant', 'Travis', 'Chambers',
+            'Denton', 'San Patricio', 'Lubbock', 'Collin', 'Culberson',
+            'Tyler', 'Wise', 'Brewster', 'Liberty', 'Montgomery', 'Parker',
+            'Rockwall', 'Webb', 'Hardin', 'Victoria', 'Wichita', 'Bell',
+            'Fort Bend', 'Johnson', 'Smith', 'Waller', 'Comal', 'Ellis',
+            'Kaufman', 'Carson', 'Hidalgo', 'Marion', 'Bowie', 'Caldwell',
+            'Hood', 'McLennan', 'Harrison', 'Jeff Davis', 'Hays', 'Hunt',
+            'Kleberg', 'Polk', 'Fayette', 'Maverick', 'Randall', 'Navarro',
+            'Gillespie', 'Atascosa', 'Brazos', 'Karnes', 'Wilson'],
+            
+            'Utah': ['Davis', 'Emery', 'Salt Lake', 'Uintah', 'Utah', 'Weber', 'Cache',
+            'Grand', 'Box Elder', 'Duchesne', 'Garfield', 'Iron', 'San Juan',
+            'Tooele', 'Washington', 'Wayne', 'Daggett', 'Carbon'],  
+            
+            'Vermont': ['Addison', 'Chittenden', 'Windsor', 'Windham', 'Washington',
+            'Rutland', 'Bennington'],  
+            
+            'Virgin Islands': ['St John', 'St Thomas', 'St Croix'],  
+            
+            'Virginia': ['Alexandria City', 'Arlington', 'Chesapeake City', 'Chesterfield',
+            'Fairfax', 'Fairfax City', 'Fredericksburg City', 'Hampton City',
+            'Hanover', 'Henrico', 'Newport News City', 'Norfolk City',
+            'Northampton', 'Prince William', 'Richmond City', 'Salem City',
+            'Smyth', 'Virginia Beach City', 'Fauquier', 'Roanoke', 'Madison',
+            'Warren', 'Augusta', 'Roanoke City', 'Washington',
+            'Falls Church City', 'Suffolk City', 'Buchanan', 'Charles',
+            'Charlottesville City', 'Hopewell City', 'Lynchburg City',
+            'Bristol City', 'Campbell', 'Carroll', 'Covington City',
+            'Martinsville City', 'Portsmouth City', 'Winchester City', 'York',
+            'Amherst', 'Giles', 'King William', 'Loudoun', 'Prince Edward',
+            'Wythe', 'Culpeper', 'Frederick', 'Northumberland', 'Stafford',
+            'Caroline', 'Isle of Wight', 'Henry', 'Rockbridge', 'Wise',
+            'Tazewell', 'Rockingham', 'Page', 'Albemarle', 'Pittsylvania'],
+            
+            'Washington': ['Clark', 'King', 'Pierce', 'Snohomish', 'Spokane', 'Yakima',
+            'Asotin', 'Benton', 'Thurston', 'Chelan', 'Cowlitz', 'Kitsap',
+            'Walla Walla', 'Whatcom', 'Clallam', 'Okanogan', 'Grays Harbor',
+            'Mason', 'Jefferson', 'Stevens', 'Adams', 'Kittitas', 'Klickitat',
+            'Lewis', 'Skagit', 'Whitman', 'Skamania', 'Columbia', 'Franklin',
+            'Grant', 'Pend Oreille', 'Garfield', 'San Juan'],  
+            
+            'West Virginia': ['Greenbrier', 'Kanawha', 'Ohio', 'Cabell', 'Hancock', 'Wood',
+            'Brooke', 'Gilmer', 'Tucker', 'Wayne', 'Fayette', 'Putnam',
+            'Monongalia', 'Marshall', 'Berkeley', 'Harrison', 'Raleigh',
+            'Summers', 'Marion', 'Mercer'],  
+            
+            'Wisconsin': ['Brown', 'Chippewa', 'Columbia', 'Dane', 'Douglas', 'Dunn',
+            'Eau Claire', 'Grant', 'Kenosha', 'La Crosse', 'Marathon',
+            'Milwaukee', 'Oconto', 'Outagamie', 'Ozaukee', 'Price', 'Racine',
+            'Rock', 'Sheboygan', 'St. Croix', 'Taylor', 'Walworth',
+            'Washington', 'Waukesha', 'Winnebago', 'Wood', 'Buffalo', 'Vilas',
+            'Dodge', 'Vernon', 'Fond du Lac', 'Manitowoc', 'Jefferson',
+            'Kewaunee', 'Sauk', 'Florence', 'Rusk', 'Door', 'Oneida', 'Polk',
+            'Forest', 'Green', 'Ashland', 'Waupaca', 'Barron', 'Jackson',
+            'Monroe', 'Trempealeau'],  
+            
+            'Wyoming': ['Laramie', 'Albany', 'Campbell', 'Fremont', 'Natrona', 'Sheridan',
+            'Sweetwater', 'Teton', 'Uinta', 'Park', 'Sublette', 'Carbon',
+            'Lincoln', 'Converse', 'Platte', 'Johnson', 'Crook', 'Big Horn',
+            'Weston', 'Goshen']
+        };
+
+        function updateStateOptions() {
+            countyDropDown.innerHTML = "";
+            var selectedState = stateDropDown.value;
+            console.log(selectedState);
+
+            // Get the state options for the selected country
+            var county = countyOptions[selectedState];
+
+            // Add new options to the state dropdown
+            county.forEach(function(county) {
+                var option = document.createElement("option");
+                option.text = county;
+                option.value = county;
+                countyDropDown.add(option);
+            });
+        }
+
+        // Listen for the change event of the country dropdown
+        stateDropDown.addEventListener("change", updateStateOptions);
+        // Initial update of state options
+        // updateStateOptions();
+
+
+        $(document).ready(function() {
+            $("form").submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: "POST",
+                    url: "/submit",
+                    data: formData,
+                    success: function(response) {
+                        $("#output").text(response.content);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+
+
+    </script>
+
+
+</body>
+</html>
