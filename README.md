@@ -13,10 +13,12 @@ After label encoding the categorical values and scaling the dataset using standa
 Three machine learning models have been created: One using XGBoost and the other two using different models of Artificial Neural Networks.<br/>
 All the models have minimal Mean Absolute Error(MAE) of less than 3 on the testing dataset.<br/>
 However the ANN model with 64 nodes in hidden layer 1, 64 nodes in hidden layer 2, and 1 node in the output layer produced the minimal MASE of 2.007 and so it is used in the deployment. <br/>
+All the trained models are saved in the datasets folder.<br>
 
 # The EDA and ML model's code can be found in the file named Notebook.ipynb <br/>
 
 # Deployment
+Before running the app.py file, please save the model_64_64_1.pkl file in the same directory as the app.py file.<br>
 The model has been deployed using a Flask app. Whenever the user presses submit button on the Web page, the route /submit is hit. It takes the input from the request object and predicts the AQI for the corresponding input.<br/>
 As the response object, it sends the output data(the predicted AQI) and the historic data (Data for that county and State as available in the dataset) so that a graph can be plotted. <br/>
 The output is pushed into the html page and a graph is created using javascript that is displayed below the prediction.
