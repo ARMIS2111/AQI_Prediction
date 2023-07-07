@@ -18,7 +18,6 @@ All the trained models are saved in the datasets folder.<br>
 # The EDA and ML model's code can be found in the file named Notebook.ipynb <br/>
 
 # Deployment
-Before running the app.py file, please save the model_64_64_1.pkl file in the same directory as the app.py file.<br>
 The model has been deployed using a Flask app. Whenever the user presses submit button on the Web page, the route /submit is hit. It takes the input from the request object and predicts the AQI for the corresponding input.<br/>
 As the response object, it sends the output data(the predicted AQI) and the historic data (Data for that county and State as available in the dataset) so that a graph can be plotted. <br/>
 The output is pushed into the html page and a graph is created using javascript that is displayed below the prediction.
@@ -26,7 +25,9 @@ The output is pushed into the html page and a graph is created using javascript 
 
 
 # How to run the app
-Simply download the repository and run the app.py file. <br/>
+Download the repository.<br>
+Before running the app.py file, please save the model_64_64_1.pkl file in the same directory as the app.py file.<br/>
+Run the app.py file. <br/>
 Hit the link displayed in the terminal.<br/>
 Input data in the form.<br/>
 Press Submit.<br/>
